@@ -1,11 +1,12 @@
 # Interface for _Artemis_ Networking (IAN)
-
 [![Build Status](https://secure.travis-ci.org/rjwut/ian.svg)](http://travis-ci.org/rjwut/ian)
-
-**IAN** is an unofficial Java library for communicating with [_Artemis Spaceship Bridge Simulator_](https://artemisspaceshipbridge.com/) servers and clients.
-
-IAN is a heavily revamped version of [ArtClientLib](https://github.com/rjwut/ArtClientLib). As of this writing (7 Oct 2022), it supports _Artemis_ versions 2.7.5 and later. If you need Java library support for previous versions of _Artemis_, please see the version table below:
-
+**IAN** is an unofficial 
+Java library for communicating with
+[_Artemis Spaceship Bridge Simulator_](https://artemisspaceshipbridge.com/) servers and clients.
+IAN is a heavily revamped version of 
+ 	[ArtClientLib](https://github.com/rjwut/ArtClientLib). 
+	As of this writing (7 Oct 2022), it supports _Artemis_ versions 2.7.5 and later. 	
+	If you need Java library support for previous versions of _Artemis_, please see the version table below:
 _Artemis_ | IAN/ArtClientLib
 ---: | ---
 2.7.0-4 | [IAN 3.4.0](https://github.com/rjwut/ian/releases/tag/v3.4.0)
@@ -16,9 +17,10 @@ _Artemis_ | IAN/ArtClientLib
 2.0 | [ArtClientLib v2.3.0](https://github.com/rjwut/ArtClientLib/releases/tag/v2.3.0)
 1.x | [ArtClientLib v1.x](https://github.com/dhleong/ArtClientLib)
 
-Note, however, that these previous versions will be missing various bug fixes and enhancements found in the latest version.
-
-This library was originally developed by Daniel Leong and released on GitHub with permission of the developer of _Artemis_, Thom Robertson.
+Note, that these previous versions 
+	will be missing various bug fixes and enhancements found in the latest version.
+This library was originally developed by Daniel Leong and 
+	released on GitHub with permission of the developer of _Artemis_, Thom Robertson.
 
 ## Things to Know Before Using This Library
 
@@ -101,27 +103,20 @@ The `com.walkertribe.ian.example` package contains some simple demonstration cla
 2. **When you receive a connection, connect to the _Artemis_ server for which you are proxying.** This is done exactly the same way as you would for creating an _Artemis_ client, as documented in "Connecting to an _Artemis_ Server". You now have two `ArtemisNetworkInterface`s: one for the client and one for the server.
 
 3. **Pass through all packets.** The `proxyTo()` method on `ArtemisNetworkInterface` creates a "pass through" connection between two connections of opposite origin types. Any packet that is not caught by a listener method will be passed through automatically. Note that `proxyTo()` only creates connection in one direction; to pass through packets both ways, each connection will need to call `proxyTo()` on the other.
-
 4. **Turn off auto-heartbeat.** By default, `ArtemisNetworkInterface` will automatically send periodic heartbeat packets so that the remote machine knows that it's still alive. However, in this scenario, your proxy is going to automatically forward the heartbeat packets it receives, so it doesn't need to send its own. So you will want to turn off automatic heartbeat packet sending on both sides. To do this, call `setAutoSendHeartbeat(false)`. (Note: If for some reason you are actually listening for heartbeat packets, you will need to pass them along manually.)
-
 5. **Add listeners.** Add your listeners to both the client and server interface objects. Once the listener has caught the packet and extracted whatever information it wants from it, you can either send the packet along by passing it to `send()`, suppress it (by doing nothing), or even inject your own packets instead (by constructing them and passing them to `send()`). Remember that `proxyTo()` does **not** pass along packets caught by listeners, so it's up to you to `send()` them if you want them passed along. Also, keep in mind that multiple listeners can catch the same packet; be careful not to send it more than once!
-
 6. **Start both network interfaces.** Invoke `start()` on both of them to start consuming packets from both connections.
-
 7. **When one side disconnects, close the connection to the other side.** Listen for the `DisconnectEvent` from both sides. When you receive it from one side, invoke `ArtemisNetworkInterface.stop()` on the other connection (or both connections, if that's easier; calling `stop()` on an already closed connection has no effect).
-
 ### Make Your _Artemis_ Server Discoverable on the LAN
 
 > See `AnnounceServerDemo` for example code.
-
-1. **Construct a `ServerDiscoveryResponder`.** You can either determine the IP and host name to announce yourself (in which case, it's up to you to ensure they are correct), or you can use the no-arg constructor and allow IAN to attempt to select the appropriate network interface to use. Only active, non-loopback interfaces where the address corresponds to an [IPv4 private network](https://en.wikipedia.org/wiki/Private_network) will be considered. If no suitable interface is found, an `IOException` will be thrown with the message "No suitable network interface found." Those that meet these criteria will be sorted, first by whether or not it is a wifi interface (with non-wifi preferred), then by class (A, B, then C). The most preferred interface will be selected.
+1. **Construct a `ServerDiscoveryResponder`.** You can either 
+		determine the IP and host name to announce yourself (in which case, it's up to you to ensure they are correct), or you can use the no-arg constructor and allow IAN to attempt to select the appropriate network interface to use. Only active, non-loopback interfaces where the address corresponds to an [IPv4 private network](https://en.wikipedia.org/wiki/Private_network) will be considered. If no suitable interface is found, an `IOException` will be thrown with the message "No suitable network interface found." Those that meet these criteria will be sorted, first by whether or not it is a wifi interface (with non-wifi preferred), then by class (A, B, then C). The most preferred interface will be selected.
 
 2. **Run the `ServerDiscoveryResponder` instance.** To do this, construct a new `Thread`, passing in the `ServerDiscoveryResponder` instance, then call `start()` on the `Thread`. While the `Thread` is running, the `ServerDiscoveryResponder` will automatically respond to any discovery requests it receives.
 
 3. **Invoke `stop()` when you are no longer accepting client connections.** You don't want to continue to announce your server's presence to the LAN if you're not accepting client connections anymore. Calling `stop()` on the `ServerDiscoveryResponder` will cause it to shut down the `Thread` so that it will stop responding to requests.
-
 ### Event Listeners
-
 To make your application react to events, you must write one or more event listeners and register them with your `ThreadedArtemisNetworkInterface` object via the `addListener()` method. An event listener can be any `Object` which has one or more methods marked with the `@Listener` annotation. A listener method must be `public`, return `void`, and have exactly one argument. The type of that argument indicates what sort of events will cause the method to be invoked:
 
 * `ConnectionEvent`: Events related to IAN's connection with the remote machine or its heartbeat.
@@ -236,32 +231,54 @@ The `vesselData.xml` file contains information about the game's factions and ves
 
 `Faction` and `Vessel` data can also be retrieved directly from the `VesselData` object, which you can get by calling `Context.getVesselData()`. You can then invoke `getFaction(int)` or `getVessel(int)` to retrieve the `Faction` or `Vessel` with the corresponding ID. You can also iterate all the available `Faction`s or `Vessel`s with the `factionIterator()` and `vesselIterator()` methods.
 
-`DefaultContext` loads resource files on demand and caches them for subsequent requests. If you wish to preload all resources up front, you can do so with the `preloadModels()` and `preloadGrids()` methods.
-
+`DefaultContext` loads resource files 
+			on demand and caches them for subsequent requests.
+		If you wish to preload all resources up front, you can do so with the `preloadModels()` and `preloadGrids()` methods.
 Note that whenever you attempt to get a reference to a single `Faction` or `Vessel`, IAN may return `null`. This occurs when the `VesselData` contains no `Faction` or `Vessel` that corresponds to the given ID. This may occur when the remote machine's `vesselData.xml` file doesn't match yours. You should make sure that your code handles this scenario gracefully.
-
 ## Acknowledgements 
-
-Thanks to Thom Robertson and Incandescent Workshop for creating _Artemis_, and for so graciously tolerating the community's desire to tinker with their baby.
-
-Daniel Leong ([@dhleong](https://github.com/dhleong)) created the original version of ArtClientLib and did a lot of the difficult, thankless gruntwork of reverse engineering the _Artemis_ protocol.
-
-Various GitHub users have contributed to IAN by helping to discover and document the protocol, creating pull requests to implement features or bug fixes, or issuing bug reports. Their help is very much appreciated. They are, in alphabetical order:
-
+Thanks to Thom 
+Robertson and 
+Incandescent Workshop for creating _Artemis_, and for so
+	graciously tolerating the community's desire to tinker with their baby.
+Daniel Leong ([@dhleong](https://github.com/dhleong)) 
+	created the original version of ArtClientLib and did a lot of the difficult, 
+	thankless gruntwork of reverse engineering the _Artemis_ protocol.
+Various GitHub users have contributed to 
+IAN by helping  discover and document the protocol, 
+	creating pull requests to implement features or
+	bug fixes, or issuing 
+bug reports. Their help is very much appreciated.
+ in alphabetical order:
 * [@abrindam](https://github.com/abrindam)
+
 * [@briandurney](https://github.com/briandurney)
+
 * [@chrivers](https://github.com/chrivers)
+
 * [@dthaler](https://github.com/dthaler)
+
 * [@Hackmancoltaire](https://github.com/Hackmancoltaire)
+
 * [@huin](https://github.com/huin)
+
 * [@IvanSanchez](https://github.com/IvanSanchez)
+
 * [@JordanLongstaff](https://github.com/JordanLongstaff)
+
 * [@karafelix](https://github.com/karafelix)
+
 * [@kiwi13cubed](https://github.com/kiwi13cubed)
+
 * [@mrfishie](https://github.com/mrfishie)
+
 * [@NoseyNick](https://github.com/NoseyNick)
+
 * [@prophile](https://github.com/prophile)
+
 * [@russjudge](https://github.com/russjudge)
+
 * [@StarryWisdom](https://github.com/StarryWisdom)
+
 * [@theGuyFromHell](https://github.com/theGuyFromHell)
+
 * [@UserMcUser](https://github.com/UserMcUser)
